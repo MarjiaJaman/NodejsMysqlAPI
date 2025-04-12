@@ -1,0 +1,18 @@
+{
+  "name": "nodejs-mysql-api",
+  "version": "1.0.0",
+  "description": "A REST API with Nodejs and Mysql",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marjia Jaman",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.2"
+  }
+}
