@@ -2,8 +2,7 @@ const express = require("express");
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+const postsRoute = require("./routes/posts");
+app.use("/posts", postsRoute);
 
 module.express = app;
