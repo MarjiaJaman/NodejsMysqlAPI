@@ -2,22 +2,19 @@ const Validator = require("fastest-validator");
 const models = require("../models");
 
 function save(req, res) {
-  const post = {
-    title: req.body.title,
+  const comment = {
     content: req.body.content,
-    imageUrl: req.body.image_url,
-    categoryId: req.body.category_id,
+    postId: req.body.post_id,
     userId: 1,
   };
 
   const schema = {
-    title: { type: "string", optional: false, max: "100" },
     content: { type: "string", optional: false, max: "500" },
-    categoryId: { type: "number", optional: false },
+    postId: { type: "number", optional: false },
   };
 
   const v = new Validator();
-  const validationResponse = v.validate(post, schema);
+  const validationResponse = v.validate(comment, schema);
 
   if (validationResponse !== true) {
     return res.status(400).json({
@@ -26,17 +23,32 @@ function save(req, res) {
     });
   }
 
-  models.Post.create(post)
-    .then((result) => {
-      res.status(201).json({
-        message: "Post created successfully",
-        post: result,
-      });
+  models.Post.findByPk(req.body.post_id)
+    .then((post) => {
+      if (post === null) {
+        res.status(404).json({
+          message: "Post not found",
+        });
+      } else {
+        models.Comment.create(comment)
+          .then((result) => {
+            res.status(201).json({
+              message: "Comment created successfully",
+              comment: result,
+            });
+          })
+          .catch((error) => {
+            res.status(500).json({
+              message: "Something went wrong",
+              error: error,
+            });
+          });
+      }
     })
-    .catch((error) => {
+    .catch((err) => {
       res.status(500).json({
         message: "Something went wrong",
-        error: error,
+        error: err,
       });
     });
 }
@@ -44,13 +56,13 @@ function save(req, res) {
 function show(req, res) {
   const id = req.params.id;
 
-  models.Post.findByPk(id)
+  models.Comment.findByPk(id)
     .then((result) => {
       if (result) {
         res.status(200).json(result);
       } else {
         res.status(404).json({
-          message: "Post not found!",
+          message: "Comment not found!",
         });
       }
     })
@@ -62,7 +74,7 @@ function show(req, res) {
 }
 
 function index(req, res) {
-  models.Post.findAll()
+  models.Comment.findAll()
     .then((result) => {
       res.status(200).json(result);
     })
@@ -75,23 +87,18 @@ function index(req, res) {
 
 function update(req, res) {
   const id = req.params.id;
-  const updatedPost = {
-    title: req.body.title,
+  const updatedComment = {
     content: req.body.content,
-    imageUrl: req.body.image_url,
-    categoryId: req.body.category_id,
   };
 
   const userId = 1;
 
   const schema = {
-    title: { type: "string", optional: false, max: "100" },
     content: { type: "string", optional: false, max: "500" },
-    categoryId: { type: "number", optional: false },
   };
 
   const v = new Validator();
-  const validationResponse = v.validate(updatedPost, schema);
+  const validationResponse = v.validate(updatedComment, schema);
 
   if (validationResponse !== true) {
     return res.status(400).json({
@@ -100,16 +107,16 @@ function update(req, res) {
     });
   }
 
-  models.Post.update(updatedPost, { where: { id: id, userId: userId } })
+  models.Comment.update(updatedComment, { where: { id: id, userId: userId } })
     .then((result) => {
       res.status(200).json({
-        message: "Post updated successfully",
-        post: updatedPost,
+        message: "Comment updated successfully",
+        post: updatedComment,
       });
     })
     .catch((error) => {
-      res.status(500).json({
-        message: "Something went wrong!",
+      res.status(200).json({
+        message: "Something went wrong",
         error: error,
       });
     });
@@ -119,15 +126,15 @@ function destroy(req, res) {
   const id = req.params.id;
   const userId = 1;
 
-  models.Post.destroy({ where: { id: id, userId: userId } })
+  models.Comment.destroy({ where: { id: id, userId: userId } })
     .then((result) => {
       res.status(200).json({
-        message: "Post deleted successfully",
+        message: "Comment deleted successfully",
       });
     })
     .catch((error) => {
-      res.status(500).json({
-        message: "Something went wrong!",
+      res.status(200).json({
+        message: "Something went wrong",
         error: error,
       });
     });
