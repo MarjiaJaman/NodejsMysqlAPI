@@ -15,10 +15,6 @@ module.exports = {
       content: {
         type: Sequelize.TEXT,
       },
-      imageUrl: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
       categoryId: {
         type: Sequelize.INTEGER,
       },

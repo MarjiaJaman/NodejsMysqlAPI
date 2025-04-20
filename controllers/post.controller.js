@@ -6,7 +6,6 @@ function save(req, res) {
   const post = {
     title: req.body.title,
     content: req.body.content,
-    imageUrl: req.body.image_url,
     categoryId: req.body.category_id,
     userId: req.userData.userId,
   };
@@ -156,7 +155,6 @@ function update(req, res) {
   const updatedPost = {
     title: req.body.title,
     content: req.body.content,
-    imageUrl: req.body.image_url,
     categoryId: req.body.category_id,
   };
 
