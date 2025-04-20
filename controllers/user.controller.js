@@ -1,6 +1,7 @@
 const models = require("../models");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { upload } = require("./image.controller");
 
 function signUp(req, res) {
   models.User.findOne({ where: { email: req.body.email } })
@@ -19,10 +20,20 @@ function signUp(req, res) {
             };
 
             models.User.create(user)
-              .then((result) => {
-                res.status(201).json({
-                  message: "User created successfully",
-                });
+              .then((user) => {
+                const token = jwt.sign(
+                  {
+                    email: user.email,
+                    userId: user.id,
+                  },
+                  process.env.JWT_KEY,
+                  function (err, token) {
+                    res.status(200).json({
+                      message: "Authentication successful!",
+                      token: token,
+                    });
+                  }
+                );
               })
               .catch((error) => {
                 res.status(500).json({
@@ -81,6 +92,8 @@ function login(req, res) {
       });
     });
 }
+
+upload;
 
 module.exports = {
   signUp: signUp,

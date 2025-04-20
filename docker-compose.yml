@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  #DB_Service
+  db_service:
+    container_name: database_container
+    image: mysql:latest
+    restart: always
+    ports:
+      - 3310:3310
+    expose:
+      - 3310
+    volumes:
+      - ./db_data:/data/db
+    environment:
+      - MYSQL_ROOT_PASSWORD=mypassword
+      - MYSQL_PASSWORD=mypassword
+      - MYSQL_USER=myuser
+      - MYSQL_DATABASE=nodejs_mysql_api
+      - MYSQL_TCP_PORT=3310
+    networks:
+      - nodejs_mysql_api_network
+
+  app:
+    container_name: app_container
+    restart: always
+    build: .
+    ports:
+      - 3000:3000
+    depends_on:
+      - db_service
+    networks:
+      - nodejs_mysql_api_network
+    volumes:
+      - .:/usr/src/app
+
+  migration:
+    container_name: migrator
+    build: .
+    depends_on:
+      - db_service
+    command: sh -c 'until nc -z db_service 3310; do sleep 1; done; npx sequelize-cli db:migrate'
+    networks:
+      - nodejs_mysql_api_network
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  nodejs_mysql_api_network:
+    driver: bridge

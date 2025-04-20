@@ -1,5 +1,6 @@
 const Validator = require("fastest-validator");
 const models = require("../models");
+const { where } = require("sequelize");
 
 function save(req, res) {
   const post = {
@@ -53,7 +54,19 @@ function show(req, res) {
   const id = req.params.id;
 
   models.Post.findByPk(id, {
-    include: [models.Category, models.User],
+    include: [
+      models.Category,
+      models.User,
+      {
+        model: models.Comment,
+        limit: 2,
+        order: [["id", "DESC"]],
+      },
+      {
+        model: models.Image,
+        order: [["id", "DESC"]],
+      },
+    ],
   })
     .then((result) => {
       if (result) {
@@ -69,6 +82,61 @@ function show(req, res) {
         message: "Something went wrong!",
       });
     });
+}
+
+function showComments(req, res) {
+  const id = req.params.id;
+
+  models.Post.findByPk(id, {
+    include: [
+      {
+        model: models.Comment,
+        order: [["id", "DESC"]],
+      },
+    ],
+  })
+    .then((result) => {
+      if (result) {
+        res.status(200).json(result.Comments);
+      } else {
+        res.status(404).json({
+          message: "Post not found!",
+        });
+      }
+    })
+    .catch((error) => {
+      res.status(500).json({
+        message: "Something went wrong!",
+      });
+    });
+}
+
+function uploadImage(req, res) {
+  const id = req.params.id;
+
+  models.Post.findByPk(id).then((post) => {
+    if (post !== null) {
+      models.Image.create({
+        postId: post.id,
+        imageUrl: "/uploads/" + req.file.filename,
+      })
+        .then((result) => {
+          res.status(201).json({
+            message: "Image Uploaded!",
+            image: result,
+          });
+        })
+        .catch((error) => {
+          res.status(500).json({
+            message: "Something went wrong!",
+          });
+        });
+    } else {
+      res.status(500).json({
+        message: "Invalid Request!",
+      });
+    }
+  });
 }
 
 function index(req, res) {
@@ -154,6 +222,8 @@ function destroy(req, res) {
 module.exports = {
   save: save,
   show: show,
+  showComments: showComments,
+  uploadImage: uploadImage,
   index: index,
   update: update,
   destroy: destroy,

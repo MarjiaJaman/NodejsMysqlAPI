@@ -1,20 +1,21 @@
 {
   "development": {
-    "username": "root",
-    "password": "urmi@#1234",
+    "username": "myuser",
+    "password": "mypassword",
     "database": "nodejs_mysql_api",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "host": "database_container",
+    "dialect": "mysql",
+    "port": 3310
   },
   "test": {
-    "username": "root",
+    "username": "myuser",
     "password": null,
     "database": "database_test",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
+    "username": "myuser",
     "password": null,
     "database": "database_production",
     "host": "127.0.0.1",

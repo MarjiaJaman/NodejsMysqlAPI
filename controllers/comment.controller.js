@@ -5,7 +5,7 @@ function save(req, res) {
   const comment = {
     content: req.body.content,
     postId: req.body.post_id,
-    userId: 1,
+    userId: req.userData.userId,
   };
 
   const schema = {
