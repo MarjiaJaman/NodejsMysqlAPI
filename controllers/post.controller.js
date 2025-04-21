@@ -1,6 +1,5 @@
 const Validator = require("fastest-validator");
 const models = require("../models");
-const { where } = require("sequelize");
 
 function save(req, res) {
   const post = {

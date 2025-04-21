@@ -1,7 +1,6 @@
 const models = require("../models");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { upload } = require("./image.controller");
 
 function signUp(req, res) {
   models.User.findOne({ where: { email: req.body.email } })
@@ -93,9 +92,21 @@ function login(req, res) {
     });
 }
 
-upload;
+function updateProfileImg(req, res) {
+  models.User.findByPk(req.userData.userId).then((user) => {
+    models.User.update(
+      { profileImageUrl: "/uploads/" + req.file.filename },
+      { where: { id: user.id } }
+    ).then((result) => {
+      res.status(201).json({
+        message: "Image Updated!",
+      });
+    });
+  });
+}
 
 module.exports = {
   signUp: signUp,
   login: login,
+  updateProfileImg: updateProfileImg,
 };
