@@ -52,65 +52,59 @@ function save(req, res) {
   });
 }
 
-function show(req, res) {
-  const id = req.params.id;
+async function show(req, res) {
+  try {
+    const id = req.params.id;
 
-  Post.findByPk(id, {
-    include: [
-      Category,
-      User,
-      {
-        model: Comment,
-        limit: 2,
-        order: [["id", "DESC"]],
-      },
-      {
-        model: models.Image,
-        order: [["id", "DESC"]],
-      },
-    ],
-  })
-    .then((result) => {
-      if (result) {
-        res.status(200).json(result);
-      } else {
-        res.status(404).json({
-          message: "Post not found!",
-        });
-      }
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: "Something went wrong!",
-      });
+    const post = await Post.findByPk(id, {
+      include: [
+        Category,
+        User,
+        {
+          model: Comment,
+          limit: 2,
+          order: [["id", "DESC"]],
+        },
+        {
+          model: models.Image,
+          order: [["id", "DESC"]],
+        },
+      ],
     });
+
+    if (post) {
+      res.status(200).json(post);
+    } else {
+      res.status(404).json({
+        message: "Post not found!",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong!",
+    });
+  }
 }
 
-function showComments(req, res) {
+async function showComments(req, res) {
   const id = req.params.id;
 
-  Post.findByPk(id, {
+  const post = await Post.findByPk(id, {
     include: [
       {
         model: Comment,
         order: [["id", "DESC"]],
       },
     ],
-  })
-    .then((result) => {
-      if (result) {
-        res.status(200).json(result.Comments);
-      } else {
-        res.status(404).json({
-          message: "Post not found!",
-        });
-      }
-    })
-    .catch((error) => {
-      res.status(500).json({
-        message: "Something went wrong!",
-      });
+  });
+
+  if (post) {
+    res.status(200).json(post.Comments);
+  } else {
+    res.status(404).json({
+      message: "Post not found!",
     });
+  }
 }
 
 function uploadImage(req, res) {
