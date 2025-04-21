@@ -1,9 +1,10 @@
 const models = require("../models");
+const User = models.User;
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 function signUp(req, res) {
-  models.User.findOne({ where: { email: req.body.email } })
+  User.findOne({ where: { email: req.body.email } })
     .then((result) => {
       if (result) {
         res.status(409).json({
@@ -18,7 +19,7 @@ function signUp(req, res) {
               password: hash,
             };
 
-            models.User.create(user)
+            User.create(user)
               .then((user) => {
                 const token = jwt.sign(
                   {
@@ -51,7 +52,7 @@ function signUp(req, res) {
 }
 
 function login(req, res) {
-  models.User.findOne({ where: { email: req.body.email } })
+  User.findOne({ where: { email: req.body.email } })
     .then((user) => {
       if (user === null) {
         res.status(401).json({
@@ -93,9 +94,9 @@ function login(req, res) {
 }
 
 function updateProfileImg(req, res) {
-  models.User.findByPk(req.userData.userId).then((user) => {
-    models.User.update(
-      { profileImageUrl: "/uploads/" + req.file.filename },
+  User.findByPk(req.userData.userId).then((user) => {
+    User.update(
+      { profileImageUrl: "/uploads/" + req.file?.filename },
       { where: { id: user.id } }
     ).then((result) => {
       res.status(201).json({

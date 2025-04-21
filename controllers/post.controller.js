@@ -1,5 +1,9 @@
 const Validator = require("fastest-validator");
 const models = require("../models");
+const Post = models.Post;
+const Comment = models.Comment;
+const Category = models.Category;
+const User = models.User;
 
 function save(req, res) {
   const post = {
@@ -25,9 +29,9 @@ function save(req, res) {
     });
   }
 
-  models.Category.findByPk(req.body.category_id).then((result) => {
+  Category.findByPk(req.body.category_id).then((result) => {
     if (result !== null) {
-      models.Post.create(post)
+      Post.create(post)
         .then((result) => {
           res.status(201).json({
             message: "Post created successfully",
@@ -51,12 +55,12 @@ function save(req, res) {
 function show(req, res) {
   const id = req.params.id;
 
-  models.Post.findByPk(id, {
+  Post.findByPk(id, {
     include: [
-      models.Category,
-      models.User,
+      Category,
+      User,
       {
-        model: models.Comment,
+        model: Comment,
         limit: 2,
         order: [["id", "DESC"]],
       },
@@ -85,10 +89,10 @@ function show(req, res) {
 function showComments(req, res) {
   const id = req.params.id;
 
-  models.Post.findByPk(id, {
+  Post.findByPk(id, {
     include: [
       {
-        model: models.Comment,
+        model: Comment,
         order: [["id", "DESC"]],
       },
     ],
@@ -112,11 +116,11 @@ function showComments(req, res) {
 function uploadImage(req, res) {
   const id = req.params.id;
 
-  models.Post.findByPk(id).then((post) => {
+  Post.findByPk(id).then((post) => {
     if (post !== null) {
       models.Image.create({
         postId: post.id,
-        imageUrl: "/uploads/" + req.file.filename,
+        imageUrl: "/uploads/" + req.file?.filename,
       })
         .then((result) => {
           res.status(201).json({
@@ -138,7 +142,7 @@ function uploadImage(req, res) {
 }
 
 function index(req, res) {
-  models.Post.findAll()
+  Post.findAll()
     .then((result) => {
       res.status(200).json(result);
     })
@@ -175,9 +179,9 @@ function update(req, res) {
     });
   }
 
-  models.Category.findByPk(req.body.category_id).then((result) => {
+  Category.findByPk(req.body.category_id).then((result) => {
     if (result !== null) {
-      models.Post.update(updatedPost, { where: { id: id, userId: userId } })
+      Post.update(updatedPost, { where: { id: id, userId: userId } })
         .then((result) => {
           res.status(200).json({
             message: "Post updated successfully",
@@ -202,7 +206,7 @@ function destroy(req, res) {
   const id = req.params.id;
   const userId = req.userData.userId;
 
-  models.Post.destroy({ where: { id: id, userId: userId } })
+  Post.destroy({ where: { id: id, userId: userId } })
     .then((result) => {
       res.status(200).json({
         message: "Post deleted successfully",

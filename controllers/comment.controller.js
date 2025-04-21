@@ -1,5 +1,7 @@
 const Validator = require("fastest-validator");
 const models = require("../models");
+const Comment = models.Comment;
+const Post = models.Post;
 
 function save(req, res) {
   const comment = {
@@ -23,14 +25,14 @@ function save(req, res) {
     });
   }
 
-  models.Post.findByPk(req.body.post_id)
+  Post.findByPk(req.body.post_id)
     .then((post) => {
       if (post === null) {
         res.status(404).json({
           message: "Post not found",
         });
       } else {
-        models.Comment.create(comment)
+        Comment.create(comment)
           .then((result) => {
             res.status(201).json({
               message: "Comment created successfully",
@@ -56,7 +58,7 @@ function save(req, res) {
 function show(req, res) {
   const id = req.params.id;
 
-  models.Comment.findByPk(id)
+  Comment.findByPk(id)
     .then((result) => {
       if (result) {
         res.status(200).json(result);
@@ -74,7 +76,7 @@ function show(req, res) {
 }
 
 function index(req, res) {
-  models.Comment.findAll()
+  Comment.findAll()
     .then((result) => {
       res.status(200).json(result);
     })
@@ -107,7 +109,7 @@ function update(req, res) {
     });
   }
 
-  models.Comment.update(updatedComment, { where: { id: id, userId: userId } })
+  Comment.update(updatedComment, { where: { id: id, userId: userId } })
     .then((result) => {
       res.status(200).json({
         message: "Comment updated successfully",
@@ -126,7 +128,7 @@ function destroy(req, res) {
   const id = req.params.id;
   const userId = 1;
 
-  models.Comment.destroy({ where: { id: id, userId: userId } })
+  Comment.destroy({ where: { id: id, userId: userId } })
     .then((result) => {
       res.status(200).json({
         message: "Comment deleted successfully",
