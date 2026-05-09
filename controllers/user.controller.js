@@ -58,31 +58,29 @@ async function login(req, res) {
         message: "Invalid credentials!",
       });
     } else {
-      bcryptjs.compare(
+      const isPasswordVerified = await bcryptjs.compare(
         req.body.password,
-        findingUser.password,
-        function (err, result) {
-          if (result) {
-            const token = jwt.sign(
-              {
-                email: findingUser.email,
-                userId: findingUser.id,
-              },
-              process.env.JWT_KEY,
-              function (err, token) {
-                res.status(200).json({
-                  message: "Authentication successful!",
-                  token: token,
-                });
-              }
-            );
-          } else {
-            res.status(401).json({
-              message: "Incorrect password!",
-            });
-          }
-        }
+        findingUser.password
       );
+      if (isPasswordVerified) {
+        const token = await jwt.sign(
+          {
+            email: findingUser.email,
+            userId: findingUser.id,
+          },
+          process.env.JWT_KEY
+        );
+        if (token) {
+          res.status(200).json({
+            message: "Authentication successful!",
+            token: token,
+          });
+        }
+      } else {
+        res.status(401).json({
+          message: "Incorrect password!",
+        });
+      }
     }
   } catch (error) {
     res.status(500).json({

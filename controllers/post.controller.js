@@ -201,11 +201,11 @@ async function update(req, res) {
           message: "Post updated successfully",
           post: updatedPost,
         });
-      } else {
-        res.status(400).json({
-          message: "Category not found!",
-        });
       }
+    } else {
+      res.status(400).json({
+        message: "Category not found!",
+      });
     }
   } catch (error) {
     res.status(500).json({
